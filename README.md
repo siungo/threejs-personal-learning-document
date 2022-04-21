@@ -119,7 +119,7 @@ onMounted(() => {
 </script>
 ```
 
-一个基本的渲染初始化就完成了，但我们需要让场景实时渲染，所以需要使用 [requestAnimationFrame](https:#developer.mozilla.org/zh-CN/docs/Web/API/Window/requestAnimationFrame) 函数来循环调用渲染函数，更新帧动画。
+一个基本的渲染初始化就完成了，但我们需要让场景实时渲染，所以需要使用 [requestAnimationFrame](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestAnimationFrame) 函数来循环调用渲染函数，更新帧动画。
 
 ```bash
 const animate = () => {
@@ -136,8 +136,8 @@ onMounted(() => {
 ```
 
 > 这里使用requestAnimationFrame而不使用setInterval的原因是，虽然这两个函数都是实现循环触发事件，但setInterval是基于时间的，requestAnimationFrame是基于帧数的，requestAnimationFrame的自适应能力强，并且在切到后台的时候会自动停止函数，详情可以了解以下两个api的文档介绍:
-[requestAnimationFrame api文档](https:#developer.mozilla.org/zh-CN/docs/Web/API/Window/requestAnimationFrame)
-[setInterval api文档](https:#developer.mozilla.org/zh-CN/docs/Web/API/setInterval)
+[requestAnimationFrame api文档](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestAnimationFrame)
+[setInterval api文档](https://developer.mozilla.org/zh-CN/docs/Web/API/setInterval)
 
 ### 监听窗口，更新视图
 
@@ -242,15 +242,15 @@ const initModel = () => {
 }
 ```
 
-> [本项目的模型文件地址（越过长城，走向世界！）](https:#sketchfab.com/3d-models/neon-signs-billboard-japanese-vaporwave-shibuya-f4fb7741b2a94ae3938355c1c34554a8)
+> [本项目的模型文件地址（越过长城，走向世界！）](https://sketchfab.com/3d-models/neon-signs-billboard-japanese-vaporwave-shibuya-f4fb7741b2a94ae3938355c1c34554a8)
 
-![模型](./mdImg/img-1.png)
+![模型](./mdImg/pic-1.jpg)
 
 ### 调整模型细节
 
 直接加载进去的模型可能不太尽人意，比如本来是钢板的地方，加载进去却像塑料，有灯的地方没有灯光照射出来等等，于是我们需要遍历并逐个调整模型中的细节。
 
-> [Object3D.traverse：获取外部模型所有子节点](https:#threejs.org/docs/index.html#api/zh/core/Object3D.traverse)
+> [Object3D.traverse：获取外部模型所有子节点](https://threejs.org/docs/index.html#api/zh/core/Object3D.traverse)
 
 ```bash
 # 获取模型内所有子节点
@@ -412,7 +412,7 @@ model.traverse((child) => {
 
 这是经过微调后的模型，是不是感觉好多了，发光的发光，反光的反光。
 
-![微调后的模型](./mdImg/img-2.png)
+![微调后的模型](./mdImg/pic-2.jpg)
 
 在座细心的各位会发现我把某些实例分层在第一层，这是为什么呢？
 
@@ -628,7 +628,7 @@ const animate = () => {
 
 最终效果是这样的，是不是有一种霓虹灯该有的梦幻的感觉？
 
-![模型](./mdImg/img-3.png)
+![模型](./mdImg/pic-3.jpg)
 
 这个辉光效果的代码借鉴于[这里](https://www.cnblogs.com/sugartang/p/14790292.html)
 
