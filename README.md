@@ -1064,3 +1064,33 @@ const renderPass = new RenderPass(scene, camera);
 
 ##### 其他动效通道
 
+再添加renderPass通道后，添加接下来的动效通道。
+
+threejs封装了很多常用的[动效通道](https://github.com/mrdoob/three.js/tree/dev/examples/jsm/postprocessing)，这里引用一个“故障风格”的动效通道。
+
+**你必须额外在官方npm包中引入它才能够正常使用threejs封装好的动效通道**
+
+```bash
+import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
+
+# 实例化一个故障风格的动效通道
+const glitchPass = new GlitchPass();
+```
+
+定义了这两个通道后，将通道添加进合成器中，再进行渲染。
+
+```bash
+# 将通道添加到合成器中
+effectComposer.add(renderPass);
+effectComposer.add(glitchPass);
+
+const animate = () => {
+  requestAnimationFrame(animate);
+
+  # 这里摒弃掉renderer.render()的渲染方式
+  # 改用合成器的渲染方式
+  effectComposer.render();
+}
+```
+
+未完待续。。。
