@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@types/three": "^0.139.0",
+    "lodash": "^4.17.21",
     "pinia": "^2.0.13",
     "three": "^0.139.2",
     "vue": "^3.2.30",

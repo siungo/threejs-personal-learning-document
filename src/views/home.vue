@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, render } from 'vue';
+import { ref, onMounted } from 'vue';
 import * as THREE from 'three';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
@@ -15,6 +15,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 
 import shaderData from '@/config/shaderData';
+import router from '@/router';
 
 // import logo from '@img/logo.png';
 
@@ -324,7 +325,7 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-.home {
+// .home {
   // background: #ccc;
-}
+// }
 </style>

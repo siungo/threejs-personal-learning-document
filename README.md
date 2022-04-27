@@ -1093,4 +1093,40 @@ const animate = () => {
 }
 ```
 
+### 曲线
+
+#### CatmullRomCurve3
+
+该函数可以将两个或多个`THREE.Vector3()`三维坐标点合并创建成一条平滑的三维曲线。
+
+```bash
+# 定义一条三维曲线
+# 该函数接受四个参数
+# - points THREE.Vector3[] 三维坐标点数组，数组中至少有两个点。
+# - closed boolean 是否闭合曲线 如该值为true，则曲线会闭合，默认为false。
+# - curveType string 可选值 'centripetal' | 'chordal' | 'catmullrom', 默认为'catmullrom'，看了下源码应该是关于曲线张力的，如果该值为'centripetal'则张力为0.5，如果该值为'chordal'则张力为0.25，如果该值为'catmullrom'则张力为参数tension的值。
+# - tension number 曲线张力，如果curveType = 'catmullrom'，则曲线张力会设置为该值，该值越大，曲线的弧度越大，默认为0.5。
+const curve = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(0, 0, 100),
+  new THREE.Vector3(0, 0, 0)
+], true)
+
+# .getPoints(number) 将曲线分成设置值等分的三维坐标点数组，这里将曲线进行100等分。
+const curvePoints = curve.getPoints(100)
+
+# 创建一个缓存几何，设置该几何的点队列
+const lineGeo = new THREE.BufferGeometry().setFromPoints(curvePoints)
+
+# 创建一个颜色为红色的基础线型材质
+const lineMate = new THREE.lineBasicMaterial({
+  color: 'red'
+})
+
+# 创建一条线
+const line = new THREE.Line(lineGeo, lineMate)
+
+# 将线添加到场景内
+scene.add(line)
+```
+
 未完待续。。。

@@ -16,31 +16,13 @@ const routes: RouteRecordRaw[] = [
       title: 'Home',
     },
   },
-  /**
-   * 子路由示例
-   */
   {
-    path: '/foo',
-    name: 'foo',
-    component: () =>
-      import(/* webpackChunkName: "foo" */ '@cp/TransferStation.vue'),
+    path: '/build',
+    name: 'build',
+    component: () => import(/* webpackChunkName: "build" */ '@views/build.vue'),
     meta: {
-      title: 'Foo',
+      title: 'Build',
     },
-    redirect: {
-      name: 'bar',
-    },
-    children: [
-      {
-        path: 'bar',
-        name: 'bar',
-        component: () =>
-          import(/* webpackChunkName: "bar" */ '@views/foo/bar.vue'),
-        meta: {
-          title: 'Bar',
-        },
-      },
-    ],
   },
 ]
 
