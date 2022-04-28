@@ -5,11 +5,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, render } from 'vue'
 import * as THREE from 'three'
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass'
+
+import buildPic1 from '@img/build-pic-1.png'
+
+import createPic from '@libs/createPic'
 
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(
@@ -27,11 +37,25 @@ const renderer = new THREE.WebGLRenderer({
 
 const build = ref<HTMLElement | null>(null)
 
+const picMeshs: THREE.Mesh[] = []
+
+const composer = new EffectComposer(renderer)
+const renderPass = new RenderPass(scene, camera)
+const outlinePass = new OutlinePass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  scene,
+  camera
+)
+
+const effectFXAA = new ShaderPass(FXAAShader)
+
 let model
+
+let group = new THREE.Group()
 
 const cameraRoute = new THREE.CatmullRomCurve3(
   [
-    new THREE.Vector3(0, 0, 15),
+    new THREE.Vector3(-5, 0, 15),
     new THREE.Vector3(-7, 0, 10),
     new THREE.Vector3(-7, 0, -1),
     new THREE.Vector3(0.2, 0, -2),
@@ -113,24 +137,70 @@ const initModel = () => {
   loader.load('/model/build/scene.gltf', (gltf) => {
     model = gltf.scene
 
+    group.add(model)
+
     model.position.set(335, -72, -15)
     model.scale.multiplyScalar(1.5)
 
+    let buildMeshs: THREE.Object3D<THREE.Event>[] = []
     model.traverse((child) => {
       if (child['isMesh']) {
         const color = child['material'].color.getHex()
 
         if (color == 5263440 || color == 5262669) {
           child['material'].color = new THREE.Color(0xeeeeee)
+          buildMeshs.push(child)
         }
       }
     })
 
+    const picMesh1 = createPic(buildPic1)
+
+    picMesh1.rotation.set(0, -Math.PI / 2, 0)
+    picMesh1.position.set(-5.58, 0, 7.5)
+
+    group.add(picMesh1)
+
+    picMeshs.push(picMesh1)
+
     // const axes = new THREE.AxesHelper(100)
     // scene.add(axes)
 
-    scene.add(model)
+    scene.add(group)
+
+    initComposer()
   })
+}
+
+const initComposer = () => {
+  composer.setSize(window.innerWidth, window.innerHeight)
+  composer.setPixelRatio(window.devicePixelRatio)
+  composer.renderTarget1.texture.encoding = THREE.sRGBEncoding
+  composer.renderTarget2.texture.encoding = THREE.sRGBEncoding
+
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setPixelRatio(window.devicePixelRatio)
+  composer.addPass(renderPass)
+
+  // outlinePass.selectedObjects = picMeshs
+  outlinePass.edgeStrength = 10.0 // 边框的亮度
+  outlinePass.edgeGlow = 1 // 光晕[0, 1]
+  outlinePass.usePatternTexture = false // 是否使用父级材质
+  outlinePass.edgeThickness = 1 // 边框宽度
+  outlinePass.downSampleRatio = 1 // 边框弯曲度
+  outlinePass.pulsePeriod = 5 // 呼吸闪烁的速度
+  outlinePass.visibleEdgeColor.set(0xffffff) // 呼吸显示的颜色
+  outlinePass.hiddenEdgeColor = new THREE.Color(0, 0, 0) // 呼吸消失的颜色
+  outlinePass.clear = true
+
+  composer.addPass(outlinePass)
+
+  effectFXAA.uniforms.resolution.value.set(
+    1 / window.innerWidth,
+    1 / window.innerHeight
+  )
+  effectFXAA.renderToScreen = true
+  // composer.addPass(effectFXAA)
 }
 
 const aniCameraProgress = (type: boolean) => {
@@ -145,18 +215,48 @@ const aniCameraProgress = (type: boolean) => {
 
   camera.position.set(point.x, point.y, point.z)
 
-  camera.lookAt(nextPoint)
+  if (progress >= 0.04 && progress <= 0.08) {
+    camera.lookAt(picMeshs[0].position)
+  } else {
+    camera.lookAt(nextPoint)
+  }
 }
 
-const mouseHandler = (e: Event) => {
+const mouseWheelHandler = (e: Event) => {
   const type = e['deltaY'] > 0
+
   aniCameraProgress(type)
 }
 
 const animate = () => {
   requestAnimationFrame(animate)
 
-  renderer.render(scene, camera)
+  composer.render()
+  // renderer.render(scene, camera)
+}
+
+const mouseMoveHandler = (e: MouseEvent) => {
+  e.preventDefault();
+
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera)
+
+  const intersects = raycaster.intersectObjects(scene.children)
+
+  const selMesh = intersects.map((v => {
+    return picMeshs.filter((j => {
+      return v.object.id == j.id
+    }))
+  })).filter(m => {
+    return m.length != 0
+  }).flat();
+
+  outlinePass.selectedObjects = selMesh;
 }
 
 onMounted(() => {
@@ -170,7 +270,8 @@ onMounted(() => {
 
   animate()
 
-  window.addEventListener('mousewheel', mouseHandler)
+  window.addEventListener('mousewheel', mouseWheelHandler)
+  window.addEventListener('mousemove', mouseMoveHandler)
 })
 </script>
 
