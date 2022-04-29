@@ -1129,4 +1129,101 @@ const line = new THREE.Line(lineGeo, lineMate)
 scene.add(line)
 ```
 
+### 坐标点
+
+#### Vector2
+
+[THREE.Vector2（二维向量）](https://threejs.org/docs/index.html#api/zh/math/Vector2)可以代表二维平面中的的一个坐标点，通常该函数用x轴，y轴即可代表一个确切坐标点，是一个常在threejs中运用到的函数。
+
+```bash
+# 创建一个二维向量
+# 该类接受两个参数
+# - x （可选）坐标点的x轴，默认为0
+# - y （可选）坐标点的y轴，默认为0
+let vector2 = new THREE.Vector2(1, 1);
+
+# 我们可以随时修改坐标点内的x，y轴
+vector2.x = 2;
+vector2.y = 2; 
+```
+
+#### Vector3
+
+[THREE.Vector3（三维向量）](https://threejs.org/docs/index.html#api/zh/math/Vector3)可以代表三维平面中的一个坐标点，通常该函数用x轴，y轴，z轴即可代表一个确切坐标点，是一个常在threejs中运用到的函数。
+
+```bash
+# 创建一个三维向量
+# 该类接受三个参数
+# - x （可选）坐标点的x轴，默认为0
+# - y （可选）坐标点的y轴，默认为0
+# - z （可选）坐标点的z轴，默认为0
+
+let vector3 = new THREE.Vector3(1, 1, 1);
+
+# 我们可以随时修改坐标点内的x，y，z轴
+vector3.x = 2;
+vector3.y = 2;
+vector3.z = 2;
+```
+
+#### Raycaster
+[THREE.Raycaster（光线投射）](https://threejs.org/docs/index.html#api/zh/core/Raycaster)可以在某个坐标点对threejs场景中投射一道光线，返回该射线照射到的物体，一般用于鼠标在threejs中的交互，计算出鼠标在场景中移动到了哪个物体。
+
+```bash
+# 创建一个光线投射
+const raycaster = new THREE.Raycaster();
+
+# 创建一个二维向量
+const pointer = new THREE.Vector2(0, 0);
+
+# 通过相机更新二维向量所对应的三维世界的坐标点
+# .setFromCamera()接受两个参数
+# - pointer 需要投射的二维向量
+# - camera 场景所对应的相机类
+raycaster.setFromCamera(pointer, camera)
+
+# 计算射线和物体的焦点
+# 返回射线所照射的物体
+# intersects返回一个object3D[]数组，你可以通过遍历操作光线所照射的物体
+# 光线是“穿透”的，光线不会因为物体位置的前后而被遮挡，所以它会返回一条射线所穿透的所有物体
+const intersects = raycaster.intersectObjects(scene.children)
+```
+
+#### document和threejs中的坐标转换
+
+网页离不开交互，如果想要在threejs中做点击事件、hover事件等交互事件，通常需要监听整个document，然后通过公式获取到鼠标映射到的模型，让模型做出相应的响应。
+
+```bash
+# 监听函数
+const mouseMoveHandler = (e: MouseEvent) => {
+  # 取消默认操作
+  e.preventDefault();
+
+  # 创建一个光线投射
+  const raycaster = new THREE.Raycaster();
+
+  # 创建一个用于保存鼠标坐标的二维向量
+  const mouse = new THREE.Vector2();
+
+  # --重点--
+  # 将鼠标位置通过公式转换为二维向量
+  # x轴 = (鼠标在窗口中的x轴 / 窗口宽度) * 2 - 1
+  # y轴 = -(鼠标在窗口中的y轴 / 窗口高度) * 2 + 1
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+  # 根据鼠标二维向量，通过相机射出射线
+  raycaster.setFromCamera(mouse, camera);
+
+  # 定义射出射线所照射的物体
+  # 拿到intersects后我们可以通过该值获取到鼠标所接触到的物体，并自行开发物体的交互操作
+  const intersects = raycaster.intersectObjects(scene.children);
+}
+
+
+onMounted(() => {
+  # 监听鼠标滑动事件
+  document.addEventListener('mousemove', mouseMoveHandler)
+})
+```
 未完待续。。。
