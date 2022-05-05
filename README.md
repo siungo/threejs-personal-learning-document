@@ -1022,6 +1022,90 @@ const pointMate = new THREE.pointsMaterial({
 point.material = pointMate;
 ```
 
+### 辅助器
+
+辅助器可以将坐标轴、光线方向、物体骨骼等三维线性的虚拟对象进行可视化，这将对开发提供友好的帮助。
+
+这里举例几个我常用的辅助器。
+
+#### 坐标轴辅助器
+
+[THREE.AxesHelper](https://threejs.org/docs/index.html#api/zh/helpers/AxesHelper)用于简单模拟并可视化整个场景的原点坐标轴x、y、z轴的对象，可帮助开发者快速定位场景中的原点。
+
+```bash
+# 创建一个坐标轴辅助器
+# 该类接受1个参数
+# - size （可选）辅助线的线段长度，默认为1
+const axesHelper = new THREE.AxesHelper(100);
+scene.add(axesHelper);
+```
+
+#### 包围盒辅助器
+
+[THREE.BoxHelper](https://threejs.org/docs/index.html#api/zh/helpers/BoxHelper)用于将场景中某个几何体或模型等3D对象进行外包围盒进行可视化操作，可帮助开发者快速查看3D对象的外包围骨骼。
+
+> 想要进行外包围辅助器，该3D对象中必须包含[BufferGeometry(缓存几何)](https://threejs.org/docs/index.html#api/zh/core/BufferGeometry)，没包含BufferGeometry的对象将无法使用外包围辅助器。
+
+```bash
+# 创建一个正方体对象
+const geo = new THREE.BoxGeometry(1, 1, 1);
+const mate = new THREE.MeshBasicMaterial({ color: 0xffffff });
+const mesh = new THREE.Mesh(geo, mate);
+
+# 创建一个包围盒辅助器
+# 该类接受2个参数
+# - object3D THREE.Object3D<THREE.Event> 需要进行可视化包围盒的3D对象
+# - color （可选）THREE.Color 包围盒线框的颜色
+const boxHelper = new THREE.BoxHelper(mesh, 0xffffff);
+
+scene.add(boxHelper);
+```
+
+#### 灯光辅助器
+
+灯光辅助器可以将各种灯光类的光线朝向进行可视化渲染，并通过箭头和线条进行显示，当添加了灯光辅助器之后，我们可以直观的看到灯光光线的朝向和灯光范围等。
+
+不同的灯光类需要匹配不同的灯光辅助器。
+
+> 因为AmbientLight环境光类没有方向，所以该光类无辅助器。
+
+```bash
+# 创建一个平行光类
+const directionalLight = new THREE.DirectionalLight(0xffffff);
+
+# 创建一个平行光辅助器类
+# 该类接受3个参数
+# - directionalLight THREE.DirectionalLight 需要进行辅助的平行光类
+# - size （可选）number 辅助线的尺寸，默认为1
+# - color （可选）THREE.Color 辅助线的颜色，如该参数为空则使用灯源的颜色
+const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 100, 0xffffff)
+
+scene.add(directionalLightHelper);
+
+# 创建一个点光源类
+const pointLight = new THREE.PointLight(0xffffff, 1);
+
+# 创建一个点光源辅助器类
+# 该类接受3个参数
+# - pointLight THREE.PointLight 需要进行辅助的点光源类
+# - size （可选）number 辅助线的尺寸，默认为1
+# - color （可选）THREE.Color 辅助线的颜色，如该参数为空则使用灯源的颜色
+const pointLightHelper = new THREE.PointLightHelper(pointLight, 100, 0xffffff);
+
+scene.add(pointLightHelper);
+
+# 创建一个聚光灯类
+const spotLight = new THREE.SpotLight(0xffffff, 1);
+
+# 创建开一个聚光灯辅助器类
+# 该类接受2个参数
+# - spotLight THREE.SpotLight 需要进行辅助的聚光灯类
+# - color （可选）THREE.Color 辅助线的颜色，如该参数为空则使用灯源的颜色
+const spotLightHelper = new THREE.SpotLightHelper(spotLight, 0xffffff);
+
+scene.add(spotLightHelper);
+```
+
 ### 后期效果
 
 #### 效果组合器（EffectComposer）
